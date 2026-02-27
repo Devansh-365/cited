@@ -159,32 +159,6 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## How the Audit Works
-
-```
-User submits brand + category
-        ↓
-Generate 15 category-specific prompts
-        ↓
-Run queries in batches of 5 (concurrent) across 3 AI platforms
-        ↓
-Check Redis cache — skip if already queried in last 24h
-        ↓
-Detect brand mentions (fuzzy match) + extract competitor names
-        ↓
-Calculate visibility score across 4 dimensions
-        ↓
-Identify gaps (queries where competitors appear, brand doesn't)
-        ↓
-Generate 5 recommendations mapped to gap types
-        ↓
-Return scored report
-```
-
-Total audit time: ~30–60 seconds depending on API latency.
-
----
-
 ## Deployment
 
 ### Deploy to Vercel
