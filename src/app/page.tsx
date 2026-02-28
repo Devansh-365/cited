@@ -245,28 +245,6 @@ export default function Home() {
               brandName={auditData?.brand.name ?? ""}
             />
 
-            {/* UpCited CTA */}
-            <div className="border-t border-gray-100 pt-8 text-center">
-              <h3 className="font-serif text-xl font-medium text-gray-900">
-                Want us to fix this for you?
-              </h3>
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-400">
-                UpCited helps brands get into AI recommendations. We can do the
-                same for {auditData?.brand.name ?? ""}.
-              </p>
-              <Button
-                className="mt-4 bg-[#104eb3] hover:bg-[#104eb3]/80"
-                asChild
-              >
-                <a
-                  href="https://upcited.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Book a 15-min call
-                </a>
-              </Button>
-            </div>
           </div>
         </div>
       </div>
