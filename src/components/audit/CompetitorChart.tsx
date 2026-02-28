@@ -2,13 +2,6 @@
 
 import type { CompetitorResult } from "@/types";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
@@ -40,26 +33,27 @@ export default function CompetitorChart({
 
   if (competitors.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>How You Compare</CardTitle>
-          <CardDescription>
-            No competitors detected. Try adding competitors manually.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div>
+        <h3 className="font-serif text-lg font-medium text-gray-900">
+          How You Compare
+        </h3>
+        <p className="mt-1 text-sm text-gray-400">
+          No competitors detected. Try adding competitors manually.
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>How You Compare</CardTitle>
-        <CardDescription>
-          Your brand vs. competitors in AI visibility
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div>
+      <h3 className="font-serif text-lg font-medium text-gray-900">
+        How You Compare
+      </h3>
+      <p className="mt-1 text-sm text-gray-400">
+        Your brand vs. competitors in AI visibility
+      </p>
+
+      <div className="mt-6">
         <ChartContainer config={chartConfig} className="h-[250px] w-full">
           <BarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
             <XAxis type="number" domain={[0, 100]} hide />
@@ -77,26 +71,26 @@ export default function CompetitorChart({
                     y={y}
                     dy={4}
                     textAnchor="end"
-                    className="text-xs fill-foreground"
-                    fontWeight={item?.isUser ? 700 : 400}
+                    className="fill-gray-600 text-xs"
+                    fontWeight={item?.isUser ? 600 : 400}
                   >
-                    {item?.isUser ? `→ ${payload.value}` : payload.value}
+                    {item?.isUser ? `${payload.value}` : payload.value}
                   </text>
                 );
               }}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={28}>
+            <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={24}>
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.isUser ? "hsl(160, 100%, 42%)" : "hsl(var(--primary))"}
+                  fill={entry.isUser ? "#104eb3" : "#e5e7eb"}
                 />
               ))}
             </Bar>
           </BarChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

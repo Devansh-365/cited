@@ -14,7 +14,7 @@ import RecommendationList from "@/components/audit/RecommendationList";
 import type { AuditResponse, CategoryId } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
+
 
 type ViewState = "welcome" | "form" | "loading" | "results" | "error";
 
@@ -163,29 +163,27 @@ export default function Home() {
 
   // Loading view
   if (viewState === "loading") {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center">
-        <AuditProgress brandName={brandNameForLoading} />
-      </div>
-    );
+    return <AuditProgress brandName={brandNameForLoading} />;
   }
 
   // Error view
   if (viewState === "error") {
     return (
-      <div className="flex h-screen w-screen items-center justify-center px-4">
-        <Card className="max-w-lg w-full">
-          <CardContent className="pt-6 text-center space-y-4">
-            <div className="w-12 h-12 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
-              <span className="text-2xl">!</span>
-            </div>
-            <h2 className="font-serif text-xl font-semibold">Audit Failed</h2>
-            <p className="text-muted-foreground">{error}</p>
-            <Button onClick={handleReset} variant="outline">
-              Try Again
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-white px-6">
+        <div className="flex max-w-md flex-col gap-4">
+          <h2 className="font-serif text-2xl font-medium text-gray-900">
+            Something went wrong
+          </h2>
+          <p className="text-sm text-gray-400">{error}</p>
+          <div className="mt-2">
+            <Button
+              className="h-10 rounded-md bg-[#104eb3] text-white hover:bg-[#104eb3]/80"
+              onClick={handleReset}
+            >
+              Try again
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -194,68 +192,72 @@ export default function Home() {
   if (viewState === "results" && auditData) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
+        <div className="mx-auto max-w-4xl px-4 py-12">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="font-serif text-2xl font-bold">AI Visibility Report</h1>
-              <p className="text-muted-foreground">
-                Results for{" "}
-                <span className="font-semibold text-foreground">
-                  {auditData.brand.name}
-                </span>
-              </p>
+          <div className="mb-8 flex items-end justify-between">
+            <div className="flex flex-col gap-1">
+              <p className="text-sm text-gray-400">Cited</p>
+              <h1 className="font-serif text-3xl font-medium text-gray-900">
+                {auditData?.brand.name}
+              </h1>
+              <p className="text-sm text-gray-400">AI Visibility Report</p>
             </div>
-            <Button variant="outline" onClick={handleReset}>
+            <Button
+              variant="outline"
+              className="text-sm"
+              onClick={handleReset}
+            >
               New Audit
             </Button>
           </div>
 
-          <Separator />
+          <Separator className="mb-8" />
 
-          {/* Score Card */}
-          <ScoreCard
-            score={auditData.visibilityScore ?? 0}
-            breakdown={
-              auditData.scoreBreakdown ?? {
-                mentionFrequency: 0,
-                sentimentQuality: 0,
-                platformCoverage: 0,
-                positionStrength: 0,
-                total: 0,
+          <div className="space-y-8">
+            {/* Score Card */}
+            <ScoreCard
+              score={auditData?.visibilityScore ?? 0}
+              breakdown={
+                auditData?.scoreBreakdown ?? {
+                  mentionFrequency: 0,
+                  sentimentQuality: 0,
+                  platformCoverage: 0,
+                  positionStrength: 0,
+                  total: 0,
+                }
               }
-            }
-            brandName={auditData.brand.name}
-          />
+              brandName={auditData?.brand.name ?? ""}
+            />
 
-          {/* Competitor Chart */}
-          <CompetitorChart
-            brandName={auditData.brand.name}
-            brandScore={auditData.visibilityScore ?? 0}
-            competitors={auditData.competitors}
-          />
+            {/* Competitor Chart */}
+            <CompetitorChart
+              brandName={auditData?.brand.name ?? ""}
+              brandScore={auditData?.visibilityScore ?? 0}
+              competitors={auditData?.competitors ?? []}
+            />
 
-          {/* Gap Table */}
-          <GapTable gaps={auditData.gaps} />
+            {/* Gap Table */}
+            <GapTable gaps={auditData?.gaps ?? []} />
 
-          {/* Recommendations */}
-          <RecommendationList
-            recommendations={auditData.recommendations}
-            brandName={auditData.brand.name}
-          />
+            {/* Recommendations */}
+            <RecommendationList
+              recommendations={auditData?.recommendations ?? []}
+              brandName={auditData?.brand.name ?? ""}
+            />
 
-          {/* UpCited CTA */}
-          <Card className="border-[#104eb3]/20 bg-[#104eb3]/5">
-            <CardContent className="pt-6 text-center space-y-3">
-              <h3 className="font-serif text-lg font-semibold">
+            {/* UpCited CTA */}
+            <div className="border-t border-gray-100 pt-8 text-center">
+              <h3 className="font-serif text-xl font-medium text-gray-900">
                 Want us to fix this for you?
               </h3>
-              <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                UpCited has helped brands get into ChatGPT&apos;s
-                recommendations within 6 months. We can do the same for{" "}
-                {auditData.brand.name}.
+              <p className="mx-auto mt-2 max-w-md text-sm text-gray-400">
+                UpCited helps brands get into AI recommendations. We can do the
+                same for {auditData?.brand.name ?? ""}.
               </p>
-              <Button size="lg" className="bg-[#104eb3] hover:bg-[#104eb3]/90" asChild>
+              <Button
+                className="mt-4 bg-[#104eb3] hover:bg-[#104eb3]/80"
+                asChild
+              >
                 <a
                   href="https://upcited.com"
                   target="_blank"
@@ -264,8 +266,8 @@ export default function Home() {
                   Book a 15-min call
                 </a>
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     );

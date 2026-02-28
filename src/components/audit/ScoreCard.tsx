@@ -1,15 +1,6 @@
 "use client";
 
 import type { ScoreBreakdown } from "@/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 
 interface ScoreCardProps {
   score: number;
@@ -19,12 +10,12 @@ interface ScoreCardProps {
 
 export default function ScoreCard({ score, breakdown, brandName }: ScoreCardProps) {
   const getScoreInfo = (s: number) => {
-    if (s < 30) return { variant: "destructive" as const, label: "Low", message: "Your brand is nearly invisible to AI" };
-    if (s <= 60) return { variant: "secondary" as const, label: "Medium", message: "AI knows you exist, but competitors lead" };
-    return { variant: "default" as const, label: "High", message: "Great AI presence! Keep optimizing" };
+    if (s < 30) return { label: "Low", message: "Your brand is nearly invisible to AI" };
+    if (s <= 60) return { label: "Medium", message: "AI knows you exist, but competitors lead" };
+    return { label: "High", message: "Great AI presence — keep optimizing" };
   };
 
-  const { variant, label, message } = getScoreInfo(score);
+  const { label, message } = getScoreInfo(score);
 
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
@@ -39,51 +30,61 @@ export default function ScoreCard({ score, breakdown, brandName }: ScoreCardProp
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>AI Visibility Score</CardTitle>
-        <CardDescription>How visible is {brandName} across AI platforms</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          {/* Score Ring */}
-          <div className="relative shrink-0">
-            <svg width="140" height="140" viewBox="0 0 100 100" className="-rotate-90">
-              <circle cx="50" cy="50" r={radius} fill="none" stroke="hsl(var(--border))" strokeWidth="8" />
-              <circle
-                cx="50" cy="50" r={radius} fill="none"
-                stroke={strokeColor} strokeWidth="8" strokeLinecap="round"
-                strokeDasharray={circumference} strokeDashoffset={offset}
-                className="score-ring"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-bold" style={{ color: strokeColor }}>{score}</span>
-              <span className="text-xs text-muted-foreground">/100</span>
-            </div>
-          </div>
+    <div>
+      <h3 className="font-serif text-lg font-medium text-gray-900">
+        AI Visibility Score
+      </h3>
+      <p className="mt-1 text-sm text-gray-400">
+        How visible is {brandName} across AI platforms
+      </p>
 
-          {/* Breakdown */}
-          <div className="flex-1 w-full">
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant={variant}>{label}</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">{message}</p>
-
-            <div className="space-y-3">
-              {breakdownItems.map((item) => (
-                <div key={item.label}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>{item.label}</span>
-                    <span className="text-muted-foreground">{item.value}% ({item.weight})</span>
-                  </div>
-                  <Progress value={item.value} className="h-2" />
-                </div>
-              ))}
-            </div>
+      <div className="mt-6 flex flex-col items-center gap-8 md:flex-row">
+        {/* Score Ring */}
+        <div className="relative shrink-0">
+          <svg width="130" height="130" viewBox="0 0 100 100" className="-rotate-90">
+            <circle cx="50" cy="50" r={radius} fill="none" stroke="#f3f4f6" strokeWidth="6" />
+            <circle
+              cx="50" cy="50" r={radius} fill="none"
+              stroke={strokeColor} strokeWidth="6" strokeLinecap="round"
+              strokeDasharray={circumference} strokeDashoffset={offset}
+              className="score-ring"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-serif text-3xl font-medium" style={{ color: strokeColor }}>
+              {score}
+            </span>
+            <span className="text-xs text-gray-300">/100</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Breakdown */}
+        <div className="w-full flex-1">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-900">{label}</span>
+            <span className="text-sm text-gray-400">— {message}</span>
+          </div>
+
+          <div className="space-y-3">
+            {breakdownItems.map((item) => (
+              <div key={item.label}>
+                <div className="mb-1 flex justify-between text-sm">
+                  <span className="text-gray-600">{item.label}</span>
+                  <span className="text-gray-400">
+                    {item.value}% ({item.weight})
+                  </span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+                  <div
+                    className="h-full rounded-full bg-[#104eb3] transition-all duration-700"
+                    style={{ width: `${item.value}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

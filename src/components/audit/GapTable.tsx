@@ -1,32 +1,10 @@
 "use client";
 
 import type { Gap } from "@/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 
 interface GapTableProps {
   gaps: Gap[];
 }
-
-const priorityVariant: Record<string, "destructive" | "secondary" | "outline"> = {
-  high: "destructive",
-  medium: "secondary",
-  low: "outline",
-};
 
 const platformLabels: Record<string, string> = {
   chatgpt: "ChatGPT",
@@ -34,69 +12,64 @@ const platformLabels: Record<string, string> = {
   google_ai: "Google AI",
 };
 
+const priorityColor: Record<string, string> = {
+  high: "text-red-500",
+  medium: "text-amber-500",
+  low: "text-gray-400",
+};
+
 export default function GapTable({ gaps }: GapTableProps) {
   if (gaps.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Where You&apos;re Missing</CardTitle>
-          <CardDescription>
-            No significant gaps found — your brand has some presence across AI
-            platforms. Keep monitoring!
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div>
+        <h3 className="font-serif text-lg font-medium text-gray-900">
+          Where You&apos;re Missing
+        </h3>
+        <p className="mt-1 text-sm text-gray-400">
+          No significant gaps found — your brand has some presence across AI
+          platforms.
+        </p>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Where You&apos;re Missing</CardTitle>
-        <CardDescription>
-          {gaps.length} gaps found — queries where competitors appear but you
-          don&apos;t
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[80px]">Priority</TableHead>
-              <TableHead>Query</TableHead>
-              <TableHead className="w-[100px]">Platform</TableHead>
-              <TableHead>Competitors Present</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {gaps.slice(0, 12).map((gap, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <Badge variant={priorityVariant[gap.priority]}>
-                    {gap.priority.toUpperCase()}
-                  </Badge>
-                </TableCell>
-                <TableCell className="font-medium">
-                  &quot;{gap.prompt}&quot;
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline">
-                    {platformLabels[gap.platform] || gap.platform}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-muted-foreground text-sm">
-                  {gap.competitorsPresent.join(", ")}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {gaps.length > 12 && (
-          <p className="text-sm text-muted-foreground text-center mt-4">
-            + {gaps.length - 12} more gaps
-          </p>
-        )}
-      </CardContent>
-    </Card>
+    <div>
+      <h3 className="font-serif text-lg font-medium text-gray-900">
+        Where You&apos;re Missing
+      </h3>
+      <p className="mt-1 text-sm text-gray-400">
+        {gaps.length} gaps — queries where competitors appear but you don&apos;t
+      </p>
+
+      <div className="mt-6 space-y-0 divide-y divide-gray-100">
+        {gaps.slice(0, 12).map((gap, i) => (
+          <div key={i} className="flex items-start gap-4 py-3">
+            <span
+              className={`mt-0.5 text-xs font-medium uppercase ${priorityColor[gap.priority]}`}
+            >
+              {gap.priority}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm text-gray-900">
+                &quot;{gap.prompt}&quot;
+              </p>
+              <p className="mt-0.5 text-xs text-gray-400">
+                {platformLabels[gap.platform] || gap.platform}
+                {gap.competitorsPresent.length > 0 && (
+                  <> &middot; {gap.competitorsPresent.join(", ")}</>
+                )}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {gaps.length > 12 && (
+        <p className="mt-4 text-center text-sm text-gray-400">
+          + {gaps.length - 12} more gaps
+        </p>
+      )}
+    </div>
   );
 }

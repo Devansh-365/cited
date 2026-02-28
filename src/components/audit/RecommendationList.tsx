@@ -2,26 +2,16 @@
 
 import { useState } from "react";
 import type { Recommendation } from "@/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 
 interface RecommendationListProps {
   recommendations: Recommendation[];
   brandName: string;
 }
 
-const difficultyConfig: Record<string, { variant: "default" | "secondary" | "destructive"; emoji: string }> = {
-  easy: { variant: "default", emoji: "🟢" },
-  medium: { variant: "secondary", emoji: "🟡" },
-  hard: { variant: "destructive", emoji: "🔴" },
+const difficultyLabel: Record<string, string> = {
+  easy: "Easy",
+  medium: "Medium",
+  hard: "Hard",
 };
 
 export default function RecommendationList({
@@ -33,64 +23,57 @@ export default function RecommendationList({
   if (recommendations.length === 0) return null;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Your Action Plan</CardTitle>
-        <CardDescription>
-          {recommendations.length} recommendations to improve {brandName}&apos;s
-          AI visibility
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <div>
+      <h3 className="font-serif text-lg font-medium text-gray-900">
+        Your Action Plan
+      </h3>
+      <p className="mt-1 text-sm text-gray-400">
+        {recommendations.length} recommendations to improve {brandName}&apos;s
+        AI visibility
+      </p>
+
+      <div className="mt-6 space-y-0 divide-y divide-gray-100">
         {recommendations.map((rec, i) => {
           const isExpanded = expandedIndex === i;
-          const diff = difficultyConfig[rec.difficulty] || difficultyConfig.medium;
 
           return (
-            <div
-              key={i}
-              className={`rounded-lg border p-4 transition-colors ${
-                isExpanded ? "border-primary/30 bg-primary/5" : ""
-              }`}
-            >
-              <Button
-                variant="ghost"
-                className="w-full justify-start h-auto p-0 hover:bg-transparent"
+            <div key={i} className="py-4">
+              <button
+                type="button"
+                className="flex w-full items-start gap-3 text-left"
                 onClick={() => setExpandedIndex(isExpanded ? null : i)}
               >
-                <div className="flex items-start gap-3 w-full text-left">
-                  <span className="text-lg mt-0.5 shrink-0">
-                    {diff.emoji}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold leading-snug">
-                      {i + 1}. {rec.title}
-                    </p>
-                    <div className="flex gap-2 mt-1.5">
-                      <Badge variant={diff.variant} className="text-xs">
-                        {rec.difficulty}
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {rec.impact} impact
-                      </Badge>
-                    </div>
-                  </div>
-                  <span className="text-muted-foreground text-lg shrink-0">
-                    {isExpanded ? "−" : "+"}
-                  </span>
+                <span className="mt-0.5 shrink-0 text-sm text-gray-300">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {rec.title}
+                  </p>
+                  <p className="mt-0.5 text-xs text-gray-400">
+                    {difficultyLabel[rec.difficulty] || rec.difficulty}
+                    {" "}&middot;{" "}
+                    {rec.impact} impact
+                  </p>
                 </div>
-              </Button>
+                <span className="shrink-0 text-sm text-gray-300">
+                  {isExpanded ? "−" : "+"}
+                </span>
+              </button>
 
               {isExpanded && (
-                <div className="mt-3 ml-9 space-y-3">
-                  <Separator />
+                <div className="ml-9 mt-3 space-y-3">
                   <div>
-                    <p className="text-sm font-medium mb-1">Why this matters:</p>
-                    <p className="text-sm text-muted-foreground">{rec.why}</p>
+                    <p className="text-xs font-medium text-gray-500">
+                      Why this matters
+                    </p>
+                    <p className="mt-0.5 text-sm text-gray-400">{rec.why}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium mb-1">How to do it:</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs font-medium text-gray-500">
+                      How to do it
+                    </p>
+                    <p className="mt-0.5 text-sm text-gray-400">
                       {rec.actionDetail}
                     </p>
                   </div>
@@ -99,7 +82,7 @@ export default function RecommendationList({
             </div>
           );
         })}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
