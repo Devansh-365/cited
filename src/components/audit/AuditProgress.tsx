@@ -42,7 +42,7 @@ export default function AuditProgress({ brandName }: AuditProgressProps) {
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
         </div>
-        <h2 className="text-xl font-bold text-foreground mb-2">
+        <h2 className="font-serif text-xl font-bold text-foreground mb-2">
           Auditing {brandName}
         </h2>
         <p className="text-sm text-muted">
