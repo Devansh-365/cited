@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { auditRequestSchema } from "@/lib/utils/validators";
 import { queryChatGPT } from "@/lib/ai/providers/chatgpt";
 import { queryPerplexity } from "@/lib/ai/providers/perplexity";
@@ -30,6 +31,30 @@ async function runInBatches<T>(
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 20 audits per day per IP
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "anonymous";
+    const { allowed, remaining, resetAt } = checkRateLimit(ip);
+
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          error: "Daily limit reached. You can run 20 audits per day.",
+          code: "RATE_LIMIT",
+          resetAt,
+        },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Reset": String(resetAt),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const parsed = auditRequestSchema.safeParse(body);
 
@@ -109,7 +134,12 @@ export async function POST(request: NextRequest) {
       },
     };
 
-    return NextResponse.json(auditResponse);
+    return NextResponse.json(auditResponse, {
+      headers: {
+        "X-RateLimit-Remaining": String(remaining),
+        "X-RateLimit-Reset": String(resetAt),
+      },
+    });
   } catch (error) {
     console.error("Audit API error:", error);
     return NextResponse.json(

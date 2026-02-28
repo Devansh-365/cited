@@ -41,7 +41,6 @@ You enter your brand name. We run 15 category-specific queries across 3 AI platf
 | AI — ChatGPT | OpenAI API (`gpt-4o-mini`) |
 | AI — Perplexity | Perplexity API (`sonar` model) |
 | AI — Google AI | SerpAPI (Google AI Overviews, India locale) |
-| Database | Neon (serverless PostgreSQL) |
 | Cache | Upstash Redis (24hr TTL, optional) |
 | Deployment | Vercel |
 
@@ -73,10 +72,6 @@ src/
     │   ├── prompts/categories.ts  # 120 India-focused prompts (15 × 8 categories)
     │   ├── scoring.ts             # Visibility score algorithm
     │   └── recommendations.ts    # Gap → action mapping
-    ├── db/
-    │   ├── neon.ts                # Neon client (lazy init)
-    │   ├── schema.sql             # DB schema
-    │   └── queries.ts             # CRUD helpers
     ├── cache/redis.ts             # Upstash Redis (optional, graceful fallback)
     └── utils/
         ├── constants.ts           # Categories, score weights, platforms
@@ -109,9 +104,6 @@ OPENAI_API_KEY=sk-...
 PERPLEXITY_API_KEY=pplx-...
 SERPAPI_KEY=...
 
-# Required — Database
-DATABASE_URL=postgresql://...@...neon.tech/dbname?sslmode=require
-
 # Optional — Caching (app works without it)
 UPSTASH_REDIS_REST_URL=https://...upstash.io
 UPSTASH_REDIS_REST_TOKEN=...
@@ -121,18 +113,9 @@ UPSTASH_REDIS_REST_TOKEN=...
 - [OpenAI](https://platform.openai.com/api-keys) — `gpt-4o-mini` (~$0.15 per audit)
 - [Perplexity](https://www.perplexity.ai/settings/api) — `sonar` model
 - [SerpAPI](https://serpapi.com/) — Google AI Overviews (100 free searches/mo)
-- [Neon](https://neon.tech/) — free tier available
 - [Upstash](https://upstash.com/) — free tier, optional
 
-### 3. Set up the database
-
-Run the schema against your Neon database:
-
-```bash
-psql $DATABASE_URL -f src/lib/db/schema.sql
-```
-
-### 4. Run locally
+### 3. Run locally
 
 ```bash
 npm run dev

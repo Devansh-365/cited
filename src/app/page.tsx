@@ -55,6 +55,7 @@ export default function Home() {
   const [viewState, setViewState] = useState<ViewState>("welcome");
   const [auditData, setAuditData] = useState<AuditResponse | null>(null);
   const [error, setError] = useState<string>("");
+  const [isRateLimited, setIsRateLimited] = useState(false);
   const [brandNameForLoading, setBrandNameForLoading] = useState("");
 
   const handleFormSubmit = async (responses: ResponseItem[]) => {
@@ -75,6 +76,7 @@ export default function Home() {
     setBrandNameForLoading(brandName);
     setViewState("loading");
     setError("");
+    setIsRateLimited(false);
 
     try {
       const response = await fetch("/api/audit", {
@@ -90,6 +92,9 @@ export default function Home() {
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}));
+        if (errData.code === "RATE_LIMIT") {
+          setIsRateLimited(true);
+        }
         throw new Error(errData.error || `Audit failed (${response.status})`);
       }
 
@@ -171,18 +176,41 @@ export default function Home() {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-white px-6">
         <div className="flex max-w-md flex-col gap-4">
-          <h2 className="font-serif text-2xl font-medium text-gray-900">
-            Something went wrong
-          </h2>
-          <p className="text-sm text-gray-400">{error}</p>
-          <div className="mt-2">
-            <Button
-              className="h-10 rounded-md bg-[#104eb3] text-white hover:bg-[#104eb3]/80"
-              onClick={handleReset}
-            >
-              Try again
-            </Button>
-          </div>
+          {isRateLimited ? (
+            <>
+              <h2 className="font-serif text-2xl font-medium text-gray-900">
+                Daily limit reached
+              </h2>
+              <p className="text-sm text-gray-400">
+                You&apos;ve used all 20 free audits for today. Come back
+                tomorrow to run more.
+              </p>
+              <div className="mt-2">
+                <Button
+                  variant="outline"
+                  className="h-10 rounded-md"
+                  onClick={handleReset}
+                >
+                  Back to home
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="font-serif text-2xl font-medium text-gray-900">
+                Something went wrong
+              </h2>
+              <p className="text-sm text-gray-400">{error}</p>
+              <div className="mt-2">
+                <Button
+                  className="h-10 rounded-md bg-[#104eb3] text-white hover:bg-[#104eb3]/80"
+                  onClick={handleReset}
+                >
+                  Try again
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );
