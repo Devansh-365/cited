@@ -12,6 +12,7 @@ import CompetitorChart from "@/components/audit/CompetitorChart";
 import GapTable from "@/components/audit/GapTable";
 import RecommendationList from "@/components/audit/RecommendationList";
 import type { AuditResponse, CategoryId } from "@/types";
+import { auditRequestSchema } from "@/lib/utils/validators";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -73,6 +74,22 @@ export default function Home() {
           .filter(Boolean)
       : [];
 
+    const payload = {
+      brandName,
+      websiteUrl: websiteUrl || undefined,
+      category,
+      competitors: competitors.length > 0 ? competitors : undefined,
+    };
+
+    // Validate before sending
+    const validated = auditRequestSchema.safeParse(payload);
+    if (!validated.success) {
+      const firstError = validated.error.issues[0]?.message ?? "Invalid input";
+      setError(firstError);
+      setViewState("error");
+      return;
+    }
+
     setBrandNameForLoading(brandName);
     setViewState("loading");
     setError("");
@@ -82,12 +99,7 @@ export default function Home() {
       const response = await fetch("/api/audit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brandName,
-          websiteUrl: websiteUrl || undefined,
-          category,
-          competitors: competitors.length > 0 ? competitors : undefined,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
